@@ -2,20 +2,17 @@
 
 This document aggregates all schema differences for each consecutive version transition.
 
-> Counts show elements/types added/removed/changed; detailed diffs follow for each transition.
-
 ## Global Summary
 
-| Transition | Elements + | Elements − | Elements Δ | Types + | Types − | Types Δ | Includes + | Includes − | Enum changes (attr/elem) |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 3.0.0 → 3.0.1 | 14 | 1 | 0 | 0 | 1 | 0 | 0 | 0 | 0/0 |
-| 3.0.1 → 3.0.2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0 |
-| 3.0.2 → 3.1.0 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0 |
-| 3.1.0 → 3.1.1 | 4 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0 |
-| 3.1.1 → 3.2.0 | 11 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0/0 |
-| 3.2.0 → 3.3.0 | 0 | 11 | 4 | 0 | 0 | 0 | 0 | 0 | 0/0 |
-| 3.3.0 → 3.4.0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0/0 |
-| 3.4.0 → 3.5.0 | 3 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0/0 |
+| Transitions | 
+| 3.0.0 → 3.0.1 |
+| 3.0.1 → 3.0.2 |
+| 3.0.2 → 3.1.0 |
+| 3.1.0 → 3.1.1 |
+| 3.1.1 → 3.2.0 |
+| 3.2.0 → 3.3.0 |
+| 3.3.0 → 3.4.0 |
+| 3.4.0 → 3.5.0 |
 
 ## 3.0.0 → 3.0.1
 
