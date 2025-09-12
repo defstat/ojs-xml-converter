@@ -106,6 +106,7 @@ _No include/import changes detected._
 - discipline
 - familyname
 - givenname
+
 **Removed elements:**
 - disciplin
 - firstname
@@ -141,8 +142,10 @@ _No include/import changes detected._
 - publication
 - ror
 - rorAffiliation
+
 **Removed elements:**
 - revision
+
 **Changed elements:**
 - **affiliation**
   - type: `pkp:localizedNode` → `(anonymous complexType)`
