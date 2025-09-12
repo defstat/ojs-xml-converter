@@ -16,10 +16,6 @@ final class Hop_3_4_0_to_3_5_0
             /** @var DOMElement $aff */
             $this->affiliationToName($aff, $ns, $debug);
         }
-        // foreach ($xp->query('//*[local-name()="user"]/*[local-name()="affiliation"]') as $aff) {
-        //     /** @var DOMElement $aff */
-        //     $this->affiliationToName($aff, $ns, $debug);
-        // }
 
         return $doc;
     }

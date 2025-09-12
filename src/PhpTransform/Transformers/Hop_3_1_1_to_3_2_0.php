@@ -14,17 +14,6 @@ final class Hop_3_1_1_to_3_2_0
         $xp = Xml::xp($doc);
         $ns = Xml::PKP_NS;
 
-        
-
-        // // Build wanted revision map
-        // $wantedRevBySfId = [];
-        // foreach ($xp->query('//*[local-name()="submission_file_ref"][@id]') as $ref) {
-        //     /** @var DOMElement $ref */
-        //     $id = $ref->getAttribute('id');
-        //     $rev = $ref->getAttribute('revision');
-        //     if ($id && $rev !== '') $wantedRevBySfId[$id] = $rev;
-        // }
-
         // No pre-scan needed (3.1.1 has no <publication>)
         $pubCounter = 1;
 
@@ -75,8 +64,6 @@ final class Hop_3_1_1_to_3_2_0
                         Xml::dbg($debug, 3, '➕', 'Affiliation → <name> wrapper (3.2 requirement)');
                     }
                 }
-                // $pub->appendChild($authors->parentNode->removeChild($authors));
-                // Xml::dbg($debug, 2, '➕', 'Moved <authors> into <publication>');
             }
 
             /** @var DOMElement $article */
@@ -112,7 +99,7 @@ final class Hop_3_1_1_to_3_2_0
                 Xml::moveAllChildren($xp, $doc, $article, $pub, $ln);
             }
 
-            // 4) Move native (OJS) article extension pieces now under <publication>
+            // 4) Move native extension metadata into <publication>
             foreach (['issue_identification','pages','covers', ] as $ln) {
                 Xml::moveAllChildren($xp, $doc, $article, $pub, $ln);
             }
@@ -193,11 +180,6 @@ final class Hop_3_1_1_to_3_2_0
                 if ($nameFromChosen instanceof DOMElement) {
                     $sf->appendChild($nameFromChosen->parentNode->removeChild($nameFromChosen));
                     Xml::dbg($debug, 2, '➕', 'submission_file: promoted <name> from chosen revision');
-                // } else {
-                //     $fallback = $chosen ? trim((string)$xp->query('./*[local-name()="mimetype"]', $chosen)->item(0)?->textContent) : '';
-                //     if ($fallback === '') $fallback = 'file';
-                //     $sf->appendChild(Xml::newEl($doc, 'name', $fallback));
-                //     Xml::dbg($debug, 2, '➕', "submission_file: synthesized <name>{$fallback}</name>");
                 }
             }
 
@@ -383,88 +365,6 @@ final class Hop_3_1_1_to_3_2_0
             }
         }
 
-        
-
         return $doc;
     }
-
-    // /**
-    // * 3.2.0 migration:
-    // * - Remove @date_published from <article>
-    // * - Remove stray <article>/<date_published> elements (invalid in 3.2.0)
-    // * - Ensure the first <publication> (or <pkppublication>) under the article has a <date_published> child.
-    // */
-    // private function migrateArticleDatePublishedToPublication(\DOMDocument $doc, \DOMXPath $xp, bool $debug): void
-    // {
-    //     // Use the document’s default namespace (PKP)
-    //     $ns = $doc->documentElement && $doc->documentElement->namespaceURI
-    //         ? $doc->documentElement->namespaceURI
-    //         : 'http://pkp.sfu.ca';
-
-    //     foreach ($xp->query('//*[local-name()="article"]') as $article) {
-    //         /** @var \DOMElement $article */
-
-    //         // 1) Collect any date value from @date_published or a (now invalid) direct child <date_published>
-    //         $val = null;
-
-    //         if ($article->hasAttribute('date_published')) {
-    //             $v = trim($article->getAttribute('date_published'));
-    //             if ($v !== '') $val = $v;
-    //             $article->removeAttribute('date_published');
-    //             \OJS\PhpTransform\Util\Xml::dbg($debug, 1, '➖', 'Removed <article>@date_published');
-    //         }
-
-    //         // Remove any invalid direct child <date_published> and keep its value if we don’t have one yet
-    //         foreach (iterator_to_array($xp->query('./*[local-name()="date_published"]', $article)) as $dpEl) {
-    //             /** @var \DOMElement $dpEl */
-    //             if ($val === null) {
-    //                 $t = trim($dpEl->textContent);
-    //                 if ($t !== '') $val = $t;
-    //             }
-    //             $article->removeChild($dpEl);
-    //             \OJS\PhpTransform\Util\Xml::dbg($debug, 1, '➖', 'Removed invalid <article>/<date_published>');
-    //         }
-
-    //         // 2) Find the first publication container
-    //         $pub = $xp->query('./*[local-name()="publication" or local-name()="pkppublication"]', $article)->item(0);
-    //         if (!$pub instanceof \DOMElement) {
-    //             // If your existing hop guarantees a publication node, we can require it.
-    //             // Otherwise, bail gracefully (no place to put the date) and rely on earlier logic.
-    //             if ($val !== null) {
-    //                 \OJS\PhpTransform\Util\Xml::dbg($debug, 1, '⚠️', 'No <publication> under <article>; cannot place <date_published>');
-    //             }
-    //             continue;
-    //         }
-
-    //         // 3) If there is already a <publication>/<date_published>, don’t duplicate — prefer the existing element.
-    //         $existing = $xp->query('./*[local-name()="date_published"]', $pub)->item(0);
-    //         if ($existing instanceof \DOMElement) {
-    //             if ($val !== null && trim($existing->textContent) === '') {
-    //                 $existing->nodeValue = $val;
-    //                 \OJS\PhpTransform\Util\Xml::dbg($debug, 1, '✎', 'Filled empty <publication>/<date_published> from attribute value');
-    //             } else {
-    //                 \OJS\PhpTransform\Util\Xml::dbg($debug, 1, '•', 'Kept existing <publication>/<date_published>');
-    //             }
-    //             continue;
-    //         }
-
-    //         // 4) Create <date_published> under publication if we have a value
-    //         if ($val !== null) {
-    //             $dp = $doc->createElementNS($ns, 'date_published', $val);
-
-    //             // Optional: place it early among publication children (before text/title/abstract if you prefer).
-    //             // Here we insert as the first element child for a stable order.
-    //             $ref = null;
-    //             for ($n = $pub->firstChild; $n; $n = $n->nextSibling) {
-    //                 if ($n instanceof \DOMElement) { $ref = $n; break; }
-    //             }
-    //             if ($ref) $pub->insertBefore($dp, $ref);
-    //             else $pub->appendChild($dp);
-
-    //             \OJS\PhpTransform\Util\Xml::dbg($debug, 1, '➕', 'Inserted <publication>/<date_published>');
-    //         }
-    //     }
-    // }
-
-
 }

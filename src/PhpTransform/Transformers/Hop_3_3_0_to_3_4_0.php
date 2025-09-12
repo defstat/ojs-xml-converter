@@ -12,17 +12,13 @@ final class Hop_3_3_0_to_3_4_0
     public function transform(DOMDocument $doc, bool $debug): DOMDocument
     {
         $xp = Xml::xp($doc);
-        // $ns = $doc->documentElement && $doc->documentElement->namespaceURI
-        //     ? $doc->documentElement->namespaceURI
-        //     : Xml::PKP_NS;
 
         // 1) Normalize *all* locale attributes across the document (en_US → en, pt_BR → pt, …)
         $this->normalizeAllLocales($xp, $debug);
 
-        // // 2) 3.4.0: <affiliation> MUST be plain text (no <name> child)
-        // $this->unwrapAffiliationName($doc, $xp, $debug);
+        // 2) 3.4.0: <affiliation> MUST be plain text (no <name> child)
+        $this->unwrapAffiliationName($doc, $xp, $debug);
 
-        // Xml::dbg($debug, 0, '✅', 'Hop 3.3.0 → 3.4.0 complete');
         return $doc;
     }
 
@@ -55,36 +51,29 @@ final class Hop_3_3_0_to_3_4_0
         }
     }
 
-    // /**
-    //  * 3.4.0 schema: <affiliation> content is text; a nested <name> element is NOT allowed.
-    //  * Convert:
-    //  *   <affiliation locale="…"><name>ACME University</name></affiliation>
-    //  * to:
-    //  *   <affiliation locale="…">ACME University</affiliation>
-    //  */
-    // private function unwrapAffiliationName(DOMDocument $doc, DOMXPath $xp, bool $debug): void
-    // {
-    //     // Find all <affiliation> elements that contain a child <name>
-    //     $nodes = iterator_to_array($xp->query('//*[local-name()="affiliation"]/*[local-name()="name"]'));
-    //     foreach ($nodes as $nameEl) {
-    //         /** @var DOMElement $nameEl */
-    //         $aff = $nameEl->parentNode instanceof DOMElement ? $nameEl->parentNode : null;
-    //         if (!$aff) continue;
+    private function unwrapAffiliationName(DOMDocument $doc, DOMXPath $xp, bool $debug): void
+    {
+        // Find all <affiliation> elements that contain a child <name>
+        $nodes = iterator_to_array($xp->query('//*[local-name()="affiliation"]/*[local-name()="name"]'));
+        foreach ($nodes as $nameEl) {
+            /** @var DOMElement $nameEl */
+            $aff = $nameEl->parentNode instanceof DOMElement ? $nameEl->parentNode : null;
+            if (!$aff) continue;
 
-    //         // Get the text content from <name>
-    //         $text = trim($nameEl->textContent);
+            // Get the text content from <name>
+            $text = trim($nameEl->textContent);
 
-    //         // Remove ALL children from <affiliation>
-    //         while ($aff->firstChild) {
-    //             $aff->removeChild($aff->firstChild);
-    //         }
+            // Remove ALL children from <affiliation>
+            while ($aff->firstChild) {
+                $aff->removeChild($aff->firstChild);
+            }
 
-    //         // Set the affiliation to plain text (if any)
-    //         if ($text !== '') {
-    //             $aff->appendChild($doc->createTextNode($text));
-    //         }
+            // Set the affiliation to plain text (if any)
+            if ($text !== '') {
+                $aff->appendChild($doc->createTextNode($text));
+            }
 
-    //         Xml::dbg($debug, 0, '➖', 'Affiliation: unwrapped <name> to plain text (3.4.0)');
-    //     }
-    // }
+            Xml::dbg($debug, 0, '➖', 'Affiliation: unwrapped <name> to plain text (3.4.0)');
+        }
+    }
 }

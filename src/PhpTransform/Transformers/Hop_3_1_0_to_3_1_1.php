@@ -121,7 +121,6 @@ final class Hop_3_1_0_to_3_1_1
             }
         }
 
-        // 3) 3.1.1 forbids @user_group_ref on <revision> — remove it if present
         foreach ($xp->query('//*[local-name()="submission_file"]/*[local-name()="revision"]') as $rev) {
             /** @var DOMElement $rev */
             if ($rev->hasAttribute('user_group_ref')) {
